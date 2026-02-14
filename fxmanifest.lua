@@ -1,19 +1,27 @@
-fx_version "cerulean"
-game { "gta5" }
+fx_version 'cerulean'
+game 'gta5'
+lua54 'yes'
 
-author 'snakewiz'
-description 'A flexible player customization script for FiveM.'
-repository 'https://github.com/pedr0fontoura/fivem-appearance'
-version '1.3.0'
+author 'uProject'
+description 'Character customization for u* ecosystem'
+version '2.0.0'
 
-client_script 'game/dist/index.js'
+dependencies { 'uGen' }
 
-files {
-  'web/dist/index.html',
-  'web/dist/assets/*.js',
-  'locales/*.json',
-  'peds.json',
-  'tattoos.json'
+shared_script 'config.lua'
+
+client_scripts {
+    'client.lua',
+    'client_camera.lua',
+    'client_nui.lua',
 }
 
-ui_page 'web/dist/index.html'
+files {
+    'html/index.html',
+    'html/style.css',
+    'html/script.js',
+    'peds.json',
+    'tattoos.json',
+}
+
+ui_page 'html/index.html'

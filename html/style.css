@@ -1,0 +1,662 @@
+/* ============================================
+   uSkin - Character Customization UI
+   Design System: uGen (Overwatch/Marvel Rivals)
+   Fonts: Teko (headings), Archivo (body), Oxanium (numbers)
+   ============================================ */
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Archivo', sans-serif;
+    overflow: hidden;
+    background: transparent;
+    color: #1a1a1a;
+    user-select: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+#uSkin-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: stretch;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#uSkin-container > * {
+    pointer-events: auto;
+}
+
+/* ============================================
+   LEFT PANEL - Scrollable sections sidebar
+   ============================================ */
+#uSkin-panel {
+    width: 22%;
+    max-width: 420px;
+    min-width: 320px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 30px 14px 30px 18px;
+    background: linear-gradient(to right,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(240, 240, 242, 0.88) 70%,
+        rgba(240, 240, 242, 0.0) 100%
+    );
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    animation: panelSlideIn 0.35s ease-out;
+}
+
+#uSkin-panel::-webkit-scrollbar {
+    width: 3px;
+}
+
+#uSkin-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#uSkin-panel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
+
+@keyframes panelSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   SECTIONS - Collapsible panels
+   ============================================ */
+.uskin-section {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.uskin-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f2 100%);
+    border-radius: 4px;
+    border-left: 3px solid #0a84ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    transform: skewX(-1.5deg);
+}
+
+.uskin-section-header:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.uskin-section-header:active {
+    background: linear-gradient(135deg, #f0f0f2 0%, #e8e8ea 100%);
+}
+
+.uskin-section-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    transform: skewX(1.5deg);
+}
+
+.uskin-section-chevron {
+    font-size: 18px;
+    color: #8a8a8a;
+    transition: transform 0.2s;
+    transform: skewX(1.5deg);
+    line-height: 1;
+}
+
+.uskin-section-header.open .uskin-section-chevron {
+    transform: skewX(1.5deg) rotate(180deg);
+}
+
+.uskin-section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 4px;
+}
+
+.uskin-section-content.open {
+    padding: 8px 4px 4px;
+}
+
+.uskin-section-content-inner {
+    transform: skewX(0deg);
+}
+
+/* ============================================
+   SUB-ITEMS (grouped controls within a section)
+   ============================================ */
+.uskin-item {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+}
+
+.uskin-item-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+    line-height: 1.1;
+}
+
+/* ============================================
+   RANGE SLIDER
+   ============================================ */
+.uskin-range {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.uskin-range-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.uskin-range-name {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.uskin-range-value {
+    font-family: 'Oxanium', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a84ff;
+}
+
+.uskin-range-track {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    cursor: pointer;
+}
+
+.uskin-range-track::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.uskin-range-fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 4px;
+    background-color: #0a84ff;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.uskin-range-thumb {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    background-color: #0a84ff;
+    border-radius: 2px;
+    transform: translate(-50%, -50%) skewX(-2deg);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(10, 132, 255, 0.3);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.uskin-range-track.active .uskin-range-thumb {
+    box-shadow: 0 2px 10px rgba(10, 132, 255, 0.5);
+}
+
+/* ============================================
+   NUMBER INPUT (increment/decrement)
+   ============================================ */
+.uskin-number {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.uskin-number-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.uskin-number-name {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.uskin-number-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.uskin-number-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    border-radius: 2px;
+    color: #4a4a4a;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    transform: skewX(-2deg);
+    line-height: 1;
+}
+
+.uskin-number-btn:hover {
+    background: rgba(10, 132, 255, 0.15);
+    color: #0a84ff;
+}
+
+.uskin-number-btn:active {
+    background: rgba(10, 132, 255, 0.25);
+}
+
+.uskin-number-display {
+    font-family: 'Oxanium', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0a84ff;
+    min-width: 36px;
+    text-align: center;
+}
+
+/* ============================================
+   COLOR SWATCH PICKER
+   ============================================ */
+.uskin-colors {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.uskin-colors-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.uskin-colors-name {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.uskin-colors-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.uskin-color-btn {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 1px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+    padding: 0;
+}
+
+.uskin-color-btn:hover {
+    border-color: rgba(10, 132, 255, 0.5);
+    transform: scale(1.15);
+}
+
+.uskin-color-btn.selected {
+    border-color: #0a84ff;
+    box-shadow: 0 0 0 1px #0a84ff;
+}
+
+/* ============================================
+   SELECT DROPDOWN
+   ============================================ */
+.uskin-select {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.uskin-select-label {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.uskin-select-control {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+    border-radius: 2px;
+    color: #1a1a1a;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, background 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.uskin-select-control:focus {
+    border-color: #0a84ff;
+}
+
+.uskin-select-control option {
+    background: #ffffff;
+    color: #1a1a1a;
+}
+
+/* ============================================
+   OPTIONS TOOLBAR (right of panel)
+   ============================================ */
+#uSkin-options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 30px 0;
+    animation: optionsSlideIn 0.4s ease-out;
+}
+
+@keyframes optionsSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Option button base */
+.uskin-opt-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f2 100%);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    color: #4a4a4a;
+    flex-shrink: 0;
+}
+
+.uskin-opt-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #1a1a1a;
+}
+
+.uskin-opt-btn:active {
+    transform: scale(0.9);
+}
+
+.uskin-opt-btn.active {
+    background: #0a84ff;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4);
+}
+
+.uskin-opt-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Expandable button group */
+.uskin-opt-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 38px;
+    overflow: hidden;
+    transition: gap 0.3s;
+}
+
+.uskin-opt-group:hover {
+    gap: 6px;
+}
+
+.uskin-opt-group-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f2 100%);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: #4a4a4a;
+    flex-shrink: 0;
+}
+
+.uskin-opt-group-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.uskin-opt-group-items {
+    display: flex;
+    gap: 6px;
+    max-width: 0;
+    overflow: hidden;
+    transition: max-width 0.3s ease, opacity 0.2s;
+    opacity: 0;
+}
+
+.uskin-opt-group:hover .uskin-opt-group-items {
+    max-width: 200px;
+    opacity: 1;
+}
+
+/* Save/Exit special buttons */
+.uskin-opt-btn.save {
+    background: #0a84ff;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+}
+
+.uskin-opt-btn.save:hover {
+    background: #0070e0;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.4);
+}
+
+.uskin-opt-btn.exit {
+    background: rgba(0, 0, 0, 0.06);
+    color: #8a8a8a;
+}
+
+.uskin-opt-btn.exit:hover {
+    background: rgba(0, 0, 0, 0.12);
+    color: #4a4a4a;
+}
+
+/* ============================================
+   TATTOO LIST
+   ============================================ */
+.uskin-tattoo-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.uskin-tattoo-tab {
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+    border-radius: 2px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #4a4a4a;
+    cursor: pointer;
+    transition: all 0.15s;
+    transform: skewX(-2deg);
+}
+
+.uskin-tattoo-tab:hover {
+    background: rgba(10, 132, 255, 0.08);
+    color: #1a1a1a;
+}
+
+.uskin-tattoo-tab.active {
+    border-color: #0a84ff;
+    background: rgba(10, 132, 255, 0.12);
+    color: #0a84ff;
+}
+
+.uskin-tattoo-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.uskin-tattoo-list::-webkit-scrollbar {
+    width: 0;
+}
+
+.uskin-tattoo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 2px;
+    margin-bottom: 3px;
+    transition: background 0.15s;
+}
+
+.uskin-tattoo-item:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.uskin-tattoo-name {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1a1a;
+    flex: 1;
+}
+
+.uskin-tattoo-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.uskin-tattoo-btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Teko', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.15s;
+    transform: skewX(-2deg);
+}
+
+.uskin-tattoo-btn.apply {
+    background: #0a84ff;
+    color: #ffffff;
+}
+
+.uskin-tattoo-btn.apply:hover {
+    background: #0070e0;
+}
+
+.uskin-tattoo-btn.delete {
+    background: rgba(255, 69, 58, 0.1);
+    color: #ff453a;
+}
+
+.uskin-tattoo-btn.delete:hover {
+    background: rgba(255, 69, 58, 0.2);
+}
+
+.uskin-tattoo-btn.applied {
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
+    cursor: default;
+}
