@@ -53,11 +53,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 30px 14px 30px 18px;
-    background: linear-gradient(to right,
-        rgba(255, 255, 255, 0.92) 0%,
-        rgba(240, 240, 242, 0.88) 70%,
-        rgba(240, 240, 242, 0.0) 100%
-    );
+    background: transparent;
     transform: translateX(0);
     transition: transform 0.3s ease;
     animation: panelSlideIn 0.35s ease-out;
@@ -102,7 +98,7 @@ body {
     padding: 10px 14px;
     background: linear-gradient(135deg, #ffffff 0%, #f0f0f2 100%);
     border-radius: 4px;
-    border-left: 3px solid #0a84ff;
+    border-left: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     transition: background 0.15s, box-shadow 0.15s;
