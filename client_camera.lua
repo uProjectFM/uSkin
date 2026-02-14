@@ -106,15 +106,8 @@ function RotateCamera(direction)
 end
 
 function PedTurnAround()
-    if not playerHeading then return end
-
-    isTurnedAround = not isTurnedAround
-    local playerPed = PlayerPedId()
-
-    local newHeading = isTurnedAround and (playerHeading + 180.0) or playerHeading
-    SetEntityHeading(playerPed, newHeading % 360.0)
-    TaskStandStill(playerPed, -1)
-
+    if not cameraHandle then return end
+    cameraAngle = cameraAngle + 180.0
     updateCamera()
 end
 
