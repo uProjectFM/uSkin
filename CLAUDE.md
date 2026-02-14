@@ -1,27 +1,51 @@
 # uSkin - Character Customization
 
 ## Overview
-uSkin is a comprehensive character customization resource for FiveM, part of the u* ecosystem. Fork of fivem-appearance, rewritten from React/TypeScript to vanilla JS/Lua with uGen integration.
+uSkin is a comprehensive character customization resource for FiveM, part of the u* ecosystem. Fork of fivem-appearance, rewritten from React/TypeScript to vanilla JS/Lua with uGen integration. Full drop-in replacement for esx_skin.
 
 ## Architecture
 - **Frontend**: Vanilla HTML/CSS/JS (no build step)
 - **Client**: Lua 5.4 (no TypeScript)
-- **Dependencies**: uGen (hard dependency - notifications, confirm modals, debug mode)
+- **Server**: Lua — ESX DB integration, dual-format save, backpack weight, admin command
+- **Dependencies**: uGen, es_extended, oxmysql, skinchanger (kept for ESX.SpawnPlayer compat)
 - **Design System**: uGen Overwatch/Marvel Rivals aesthetic (Teko, Archivo, Oxanium fonts)
 
 ## Files
 | File | Purpose |
 |---|---|
 | `fxmanifest.lua` | Resource manifest |
-| `config.lua` | Constants: face features, overlays, eye colors, hair decorations, clothes data |
-| `client.lua` | Core: appearance get/set, model loading, settings calculation, exports |
-| `client_camera.lua` | Camera system: presets, interpolation, rotation, ped turn around, clothes toggle |
+| `config.lua` | Constants, format conversion functions (shared client+server) |
+| `client.lua` | Core: appearance get/set, model loading, exports, ESX compat events |
+| `client_camera.lua` | Camera system: orbital, instant rotation, ped turn around, clothes toggle |
 | `client_nui.lua` | All NUI callbacks (20+) between JS and Lua |
+| `server.lua` | DB save/load, dual format, backpack weight, /skin admin command |
 | `html/index.html` | NUI shell with Google Fonts imports |
 | `html/style.css` | uGen design system styling |
 | `html/script.js` | All UI logic: section builders, component builders, state management |
 | `peds.json` | Ped model list (loaded at runtime) |
 | `tattoos.json` | Tattoo definitions by body zone (loaded at runtime) |
+
+## DB Integration (replaces esx_skin)
+- **Table**: `users.skin` column (LONGTEXT JSON)
+- **Dual format**: Flat skinchanger keys (for backward compat) + `_uSkin` embedded data
+- Skinchanger and ESX.SpawnPlayer read the flat keys
+- uSkin reads `_uSkin` field for full appearance data
+- Legacy skinchanger-only data auto-converted via `Config.flatToAppearance()`
+
+## esx_skin Compatibility Events (all handled)
+| Event | Source | Purpose |
+|---|---|---|
+| `esx_skin:playerRegistered` | esx_identity | Load saved skin or open creation |
+| `esx_skin:resetFirstSpawn` | esx_identity, uChar | Reset state on logout/relog |
+| `esx_skin:openSaveableMenu` | uChar, /skin cmd | Open customization + save to DB |
+| `esx_skin:openMenu` | External | Open customization without save |
+| `esx_skin:openRestrictedMenu` | esx_barbershop | Open with restricted sections |
+| `esx_skin:openSaveableRestrictedMenu` | External | Restricted + save |
+| `esx_skin:getLastSkin` | esx_property | Get cached last skin |
+| `esx_skin:setLastSkin` | esx_property | Set cached skin |
+| `esx_skin:save` (server) | Multiple | Save to DB |
+| `esx_skin:setWeight` (server) | esx:playerLoaded | Backpack weight |
+| `esx_skin:getPlayerSkin` (callback) | Multiple | Fetch from DB |
 
 ## Export API
 ```lua
@@ -69,23 +93,9 @@ The `startPlayerCustomization` config table controls which sections are shown:
 }
 ```
 
-## NUI Communication Pattern
-- Lua -> JS: `SendNUIMessage({ type = 'appearance_display' })`
-- JS -> Lua: `fetch('https://uSkin/callback_name', { body: JSON.stringify(data) })`
-- JS receives response via `RegisterNUICallback` cb parameter
-
-## uGen Integration
-- Save confirmation: `exports['uGen']:OpenConfirmModal(...)`
-- Exit confirmation: `exports['uGen']:OpenConfirmModal(...)`
-- Debug prints: `pcall(exports['uGen']:GetDebugMode)`
-
-## Feature Sections (JS)
-Freemode peds only: Genetics, Face Features, Hair, Head Overlays, Eye Color, Tattoos
-All peds: Ped Model, Clothing, Props
-
 ## Key Data Structures
 ```lua
--- Appearance data
+-- Appearance data (uSkin format)
 { model, headBlend, faceFeatures, headOverlays, components, props, hair, eyeColor, tattoos }
 
 -- Component
@@ -96,4 +106,10 @@ All peds: Ped Model, Clothing, Props
 
 -- Head overlay
 { style = N, opacity = 0.0..1.0, color = N }
+```
+
+## Format Conversion (config.lua)
+```lua
+Config.appearanceToFlat(appearance) -- uSkin -> skinchanger flat keys
+Config.flatToAppearance(skin)       -- skinchanger flat keys -> uSkin (also reads _uSkin field)
 ```

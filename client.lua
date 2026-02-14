@@ -1,7 +1,10 @@
 -- ============================
 -- uSkin - Client Core
--- Appearance get/set functions, model loading, exports
+-- Appearance get/set functions, model loading, exports, ESX integration
 -- ============================
+
+local ESX = exports['es_extended']:getSharedObject()
+local playerLoaded = false
 
 -- ============================
 -- Data loaded from JSON files
@@ -498,10 +501,12 @@ function ExitPlayerCustomization(appearance)
         -- Cancelled: revert to original appearance
         SetPlayerAppearance(GetCurrentAppearance())
     else
-        -- Saved: apply tattoos from the saved data
+        -- Saved: apply tattoos and persist to DB
         if appearance.tattoos then
             SetPedTattoos_(playerPed, appearance.tattoos)
         end
+        TriggerServerEvent('esx_skin:save', appearance)
+        Config.debugPrint('Appearance saved to DB')
     end
 
     if customizationCallback then
@@ -514,6 +519,139 @@ function ExitPlayerCustomization(appearance)
 
     Config.debugPrint('Customization ended')
 end
+
+-- ============================
+-- ESX Integration: load skin on spawn, save to DB on exit
+-- ============================
+local lastSkin = nil
+
+RegisterNetEvent('esx:playerLoaded', function(_, _, skin)
+    playerLoaded = true
+    if skin then
+        TriggerServerEvent('esx_skin:setWeight', skin)
+    end
+end)
+
+-- Triggered by esx_identity after character selection
+AddEventHandler('esx_skin:playerRegistered', function()
+    Citizen.CreateThread(function()
+        while not playerLoaded do
+            Citizen.Wait(100)
+        end
+
+        ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin)
+            if not skin then
+                -- No saved skin: open full customization for new character
+                StartPlayerCustomization(function(appearance)
+                    if appearance then
+                        TriggerServerEvent('esx_skin:save', appearance)
+                        Config.debugPrint('First-time appearance saved to DB')
+                    end
+                end, Config.defaultCustomization)
+                return
+            end
+
+            -- Extract uSkin data from dual format, or convert legacy
+            local appearance = Config.flatToAppearance(skin)
+            if appearance then
+                SetPlayerAppearance(appearance)
+                lastSkin = appearance
+                Config.debugPrint('Loaded saved appearance from DB')
+            end
+        end)
+    end)
+end)
+
+-- Reset first spawn flag (used by esx_identity and uChar on logout/relog)
+AddEventHandler('esx_skin:resetFirstSpawn', function()
+    playerLoaded = false
+    lastSkin = nil
+end)
+
+-- ============================
+-- esx_skin Compatibility Events (menu open/close)
+-- ============================
+
+-- Open saveable menu (used by uChar character creation, /skin command)
+RegisterNetEvent('esx_skin:openSaveableMenu', function(submitCb, cancelCb)
+    StartPlayerCustomization(function(appearance)
+        if appearance then
+            -- Sync skinchanger state so exports["skinchanger"]:GetSkin() is correct
+            local flat = Config.appearanceToFlat(appearance)
+            pcall(function() exports['skinchanger']:LoadSkin(flat) end)
+            lastSkin = appearance
+
+            if submitCb then submitCb() end
+        else
+            if cancelCb then cancelCb() end
+        end
+    end, Config.defaultCustomization)
+end)
+
+-- Open menu without saving (generic)
+RegisterNetEvent('esx_skin:openMenu', function(submitCb, cancelCb)
+    local config = {}
+    for k, v in pairs(Config.defaultCustomization) do config[k] = v end
+    config.allowExit = true
+
+    StartPlayerCustomization(function(appearance)
+        if appearance then
+            lastSkin = appearance
+            if submitCb then submitCb() end
+        else
+            if cancelCb then cancelCb() end
+        end
+    end, config)
+end)
+
+-- Open restricted menu (used by esx_barbershop - hair/beard/makeup only)
+RegisterNetEvent('esx_skin:openRestrictedMenu', function(submitCb, cancelCb, restrict)
+    local config = {
+        ped = false, headBlend = false, faceFeatures = false,
+        headOverlays = true, components = false, props = false,
+        tattoos = false, allowExit = true,
+    }
+
+    StartPlayerCustomization(function(appearance)
+        if appearance then
+            lastSkin = appearance
+            if submitCb then submitCb() end
+        else
+            if cancelCb then cancelCb() end
+        end
+    end, config)
+end)
+
+-- Open restricted + saveable menu
+RegisterNetEvent('esx_skin:openSaveableRestrictedMenu', function(submitCb, cancelCb, restrict)
+    local config = {
+        ped = false, headBlend = false, faceFeatures = false,
+        headOverlays = true, components = false, props = false,
+        tattoos = false, allowExit = true,
+    }
+
+    StartPlayerCustomization(function(appearance)
+        if appearance then
+            local flat = Config.appearanceToFlat(appearance)
+            pcall(function() exports['skinchanger']:LoadSkin(flat) end)
+            lastSkin = appearance
+            if submitCb then submitCb() end
+        else
+            if cancelCb then cancelCb() end
+        end
+    end, config)
+end)
+
+-- Last skin cache (used by esx_property)
+AddEventHandler('esx_skin:getLastSkin', function(cb)
+    if cb then cb(lastSkin) end
+end)
+
+AddEventHandler('esx_skin:setLastSkin', function(skin)
+    if skin then
+        lastSkin = Config.flatToAppearance(skin) or skin
+    end
+end)
 
 -- ============================
 -- Resource Cleanup

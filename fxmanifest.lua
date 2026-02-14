@@ -6,9 +6,14 @@ author 'uProject'
 description 'Character customization for u* ecosystem'
 version '2.0.0'
 
-dependencies { 'uGen' }
+dependencies { 'uGen', 'es_extended' }
 
 shared_script 'config.lua'
+
+server_scripts {
+    '@oxmysql/lib/MySQL.lua',
+    'server.lua',
+}
 
 client_scripts {
     'client.lua',
