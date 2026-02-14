@@ -1,83 +1,50 @@
 -- ============================
 -- uSkin - Camera System
--- Camera presets, interpolation, rotation, ped turn around, clothes toggle
--- Pattern based on esx_skin: CreateCam + SetCamCoord + PointCamAtCoord
+-- Orbital camera: single cam handle, instant updates, full 360 rotation
 -- ============================
 
 local CAMERAS = {
-    default = {
-        coords = { x = 0.0, y = 2.2, z = 0.2 },
-        point  = { x = 0.0, y = 0.0, z = -0.05 },
-    },
-    head = {
-        coords = { x = 0.0, y = 0.9, z = 0.65 },
-        point  = { x = 0.0, y = 0.0, z = 0.6 },
-    },
-    body = {
-        coords = { x = 0.0, y = 1.2, z = 0.2 },
-        point  = { x = 0.0, y = 0.0, z = 0.2 },
-    },
-    bottom = {
-        coords = { x = 0.0, y = 0.98, z = -0.7 },
-        point  = { x = 0.0, y = 0.0, z = -0.9 },
-    },
+    default = { distance = 2.2,  height = 0.2,  pointHeight = -0.05 },
+    head    = { distance = 0.9,  height = 0.65, pointHeight = 0.6 },
+    body    = { distance = 1.2,  height = 0.2,  pointHeight = 0.2 },
+    bottom  = { distance = 0.98, height = -0.7, pointHeight = -0.9 },
 }
 
-local OFFSETS = {
-    default = { x = 1.5, y = -1.0 },
-    head    = { x = 0.7, y = -0.45 },
-    body    = { x = 1.2, y = -0.45 },
-    bottom  = { x = 0.7, y = -0.45 },
-}
+local ANGLE_STEP = 30.0 -- degrees per rotation click
 
 local cameraHandle = nil
 local currentCamera = 'default'
-local reverseCamera = false
-local isCameraInterpolating = false
+local cameraAngle = 0.0 -- degrees, 0 = directly in front
+local isTurnedAround = false
 local playerCoords = nil
 local playerHeading = nil
 
 -- ============================
--- Helper: calculate world coords for a camera preset
+-- Core: update camera position instantly on the existing handle
 -- ============================
-local function getCamWorldCoords(playerPed, preset, reverseFactor, sideOffset)
-    local cam = CAMERAS[preset]
-    if not cam then return nil end
+local function updateCamera()
+    if not cameraHandle then return end
 
-    local rf = reverseFactor or 1
-    local ox = cam.coords.x * rf
-    local oy = cam.coords.y * rf
-    local oz = cam.coords.z
+    local preset = CAMERAS[currentCamera]
+    if not preset then return end
 
-    if sideOffset then
-        local offset = OFFSETS[preset]
-        if offset then
-            ox = (cam.coords.x + offset.x) * sideOffset * rf
-            oy = (cam.coords.y + offset.y) * rf
-        end
-    end
+    local playerPed = PlayerPedId()
+    local angleRad = math.rad(cameraAngle)
+
+    local ox = preset.distance * math.sin(angleRad)
+    local oy = preset.distance * math.cos(angleRad)
+    local oz = preset.height
 
     local camPos = GetOffsetFromEntityInWorldCoords(playerPed, ox, oy, oz)
-    local pointPos = GetOffsetFromEntityInWorldCoords(playerPed, cam.point.x, cam.point.y, cam.point.z)
+    local pointPos = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 0.0, preset.pointHeight)
+
+    SetCamCoord(cameraHandle, camPos.x, camPos.y, camPos.z)
+    PointCamAtCoord(cameraHandle, pointPos.x, pointPos.y, pointPos.z)
 
     Config.debugPrint(string.format(
-        'Camera [%s]: offset(%.2f, %.2f, %.2f) -> world(%.2f, %.2f, %.2f) point(%.2f, %.2f, %.2f)',
-        preset, ox, oy, oz, camPos.x, camPos.y, camPos.z, pointPos.x, pointPos.y, pointPos.z
+        'Camera [%s] angle=%.0f: world(%.2f, %.2f, %.2f) point(%.2f, %.2f, %.2f)',
+        currentCamera, cameraAngle, camPos.x, camPos.y, camPos.z, pointPos.x, pointPos.y, pointPos.z
     ))
-
-    return camPos.x, camPos.y, camPos.z, pointPos.x, pointPos.y, pointPos.z
-end
-
--- ============================
--- Helper: create a new cam at given world coords
--- Uses CreateCam + SetCamCoord (esx_skin pattern)
--- ============================
-local function createCamAtCoords(cx, cy, cz, px, py, pz)
-    local cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-    SetCamCoord(cam, cx, cy, cz)
-    PointCamAtCoord(cam, px, py, pz)
-    SetCamFov(cam, 50.0)
-    return cam
 end
 
 -- ============================
@@ -87,8 +54,8 @@ function StartCamera()
     local playerPed = PlayerPedId()
     playerCoords = GetEntityCoords(playerPed, true)
     playerHeading = GetEntityHeading(playerPed)
-    reverseCamera = false
-    isCameraInterpolating = false
+    isTurnedAround = false
+    cameraAngle = 0.0
     currentCamera = 'default'
 
     Config.debugPrint(string.format(
@@ -96,12 +63,12 @@ function StartCamera()
         playerPed, playerCoords.x, playerCoords.y, playerCoords.z, playerHeading
     ))
 
-    local cx, cy, cz, px, py, pz = getCamWorldCoords(playerPed, 'default', 1)
-    if not cx then return end
-
-    cameraHandle = createCamAtCoords(cx, cy, cz, px, py, pz)
+    cameraHandle = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+    SetCamFov(cameraHandle, 50.0)
     SetCamActive(cameraHandle, true)
     RenderScriptCams(true, false, 0, true, true)
+
+    updateCamera()
 
     Config.debugPrint('StartCamera: cam=' .. tostring(cameraHandle) .. ' active=' .. tostring(IsCamActive(cameraHandle)))
 end
@@ -110,99 +77,45 @@ function DestroyCamera()
     if cameraHandle then
         SetCamActive(cameraHandle, false)
         DestroyCam(cameraHandle, true)
+        RenderScriptCams(false, false, 0, true, true)
         cameraHandle = nil
     end
     currentCamera = 'default'
-    reverseCamera = false
-    isCameraInterpolating = false
+    cameraAngle = 0.0
+    isTurnedAround = false
     playerCoords = nil
     playerHeading = nil
 end
 
 function SetCameraPreset(key)
-    if isCameraInterpolating then return end
     if not cameraHandle then return end
-
     if key ~= 'current' then
         currentCamera = key
     end
-
-    local playerPed = PlayerPedId()
-    local rf = reverseCamera and -1 or 1
-    local cx, cy, cz, px, py, pz = getCamWorldCoords(playerPed, currentCamera, rf)
-    if not cx then return end
-
-    -- Interpolate from current camera to new position
-    local tmpCam = createCamAtCoords(cx, cy, cz, px, py, pz)
-    SetCamActiveWithInterp(tmpCam, cameraHandle, 1000, 1, 1)
-
-    isCameraInterpolating = true
-    local oldCam = cameraHandle
-    cameraHandle = tmpCam
-
-    Citizen.CreateThread(function()
-        while IsCamInterpolating(oldCam) or not IsCamActive(tmpCam) do
-            Citizen.Wait(100)
-        end
-        DestroyCam(oldCam, false)
-        isCameraInterpolating = false
-    end)
+    updateCamera()
 end
 
 function RotateCamera(direction)
-    if isCameraInterpolating then return end
     if not cameraHandle then return end
-
-    local playerPed = PlayerPedId()
-    local rf = reverseCamera and -1 or 1
-    local sideFactor = (direction == 'left') and 1 or -1
-
-    local cx, cy, cz, px, py, pz = getCamWorldCoords(playerPed, currentCamera, rf, sideFactor)
-    if not cx then return end
-
-    local tmpCam = createCamAtCoords(cx, cy, cz, px, py, pz)
-    SetCamActiveWithInterp(tmpCam, cameraHandle, 1000, 1, 1)
-
-    isCameraInterpolating = true
-    local oldCam = cameraHandle
-    cameraHandle = tmpCam
-
-    Citizen.CreateThread(function()
-        while IsCamInterpolating(oldCam) or not IsCamActive(tmpCam) do
-            Citizen.Wait(100)
-        end
-        DestroyCam(oldCam, false)
-        isCameraInterpolating = false
-    end)
+    if direction == 'left' then
+        cameraAngle = cameraAngle - ANGLE_STEP
+    else
+        cameraAngle = cameraAngle + ANGLE_STEP
+    end
+    updateCamera()
 end
 
 function PedTurnAround()
-    reverseCamera = not reverseCamera
+    if not playerHeading then return end
 
+    isTurnedAround = not isTurnedAround
     local playerPed = PlayerPedId()
-    if not playerCoords then return end
 
-    local seqId = OpenSequenceTask(0)
-    if seqId then
-        TaskGoStraightToCoord(
-            0,
-            playerCoords.x or playerCoords[1],
-            playerCoords.y or playerCoords[2],
-            playerCoords.z or playerCoords[3],
-            8.0, -1,
-            GetEntityHeading(playerPed) - 180.0,
-            0.1
-        )
-        TaskStandStill(0, -1)
-        CloseSequenceTask(seqId)
+    local newHeading = isTurnedAround and (playerHeading + 180.0) or playerHeading
+    SetEntityHeading(playerPed, newHeading % 360.0)
+    TaskStandStill(playerPed, -1)
 
-        ClearPedTasks(playerPed)
-        TaskPerformSequence(playerPed, seqId)
-        ClearSequenceTask(seqId)
-    end
-
-    -- Reposition camera for the reversed view
-    SetCameraPreset('current')
+    updateCamera()
 end
 
 -- ============================
@@ -222,7 +135,6 @@ function WearClothes(appearanceData, typeClothes)
         Citizen.Wait(0)
     end
 
-    -- Restore the clothing components from appearance data
     for _, propPair in ipairs(propsList) do
         local componentId = propPair[1]
         for _, comp in ipairs(appearanceData.components) do
