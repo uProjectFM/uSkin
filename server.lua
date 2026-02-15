@@ -59,6 +59,17 @@ RegisterNetEvent('esx_skin:save', function(skin)
     local xPlayer = ESX.GetPlayerFromId(source)
     if not xPlayer then return end
 
+    -- Server-side ped model validation
+    local model = skin.model
+    if model and model ~= 'mp_f_freemode_01' and model ~= 'mp_m_freemode_01' then
+        if not xPlayer.hasPerm('pedpriv') then
+            print(('[^3WARNING^7] Player ^5%s^7 (ID: ^5%s^7) tried restricted ped ^5%s^7 without pedpriv'):format(
+                xPlayer.getName(), xPlayer.source, model
+            ))
+            return
+        end
+    end
+
     local dualSkin = buildDualFormat(skin)
     if not dualSkin then return end
 
@@ -114,5 +125,27 @@ end, false, {
     validate = false,
     arguments = {
         { name = 'playerId', help = 'Target player (default: self)', type = 'player' },
+    },
+})
+
+-- ============================
+-- Admin Command: /setperm [playerId] [perm] [true/false]
+-- ============================
+ESX.RegisterCommand('setperm', 'admin', function(xPlayer, args)
+    local target = args.playerId
+    local perm = args.perm
+    local value = args.value == 'true'
+
+    target.setPerm(perm, value)
+    print(('[^2INFO^7] Admin ^5%s^7 set perm ^5%s^7 = ^5%s^7 for ^5%s^7'):format(
+        xPlayer.getName(), perm, tostring(value), target.getName()
+    ))
+end, false, {
+    help = 'Set a permission on a player',
+    validate = true,
+    arguments = {
+        { name = 'playerId', help = 'Target player', type = 'player' },
+        { name = 'perm', help = 'Permission name (e.g. pedpriv)', type = 'string' },
+        { name = 'value', help = 'true or false', type = 'string' },
     },
 })

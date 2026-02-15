@@ -130,18 +130,20 @@ const OVERLAY_ORDER = [
 // SVG Icons (inline, no external deps)
 // ============================================
 const ICONS = {
+    // Main icons
     camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
-    face: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
-    body: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    shoe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20v2H2z"/><path d="M4 14l2-6h4l1 3h5l4 3"/></svg>',
+    clothes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>',
+    // Shared sub-icons (head / chest / legs)
+    hat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c0-5 3.5-9 8-9s8 4 8 9"/><path d="M2 16h20"/><path d="M6 12c0-3.3 2.7-6 6-6"/></svg>',
+    shirt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5l-1 7h-3v11H7V10H4L3 3h5l1.5 2h5L16 3z"/></svg>',
+    pants: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v7l-2 13h-3l-1-9-1 9H8L6 9V2z"/></svg>',
+
+    // -- Standalone buttons --
     turnAround: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
     rotateLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
     rotateRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
     save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>',
     exit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    hat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 12h3v6h14v-6h3L12 2z"/></svg>',
-    shirt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-4-4H8L4 7l4 2v12h8V9l4-2z"/></svg>',
-    pants: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v8l-2 12h-3l-1-8-1 8H8L6 10V2z"/></svg>',
 };
 
 // ============================================
@@ -947,9 +949,9 @@ function createOptGroup(groupIcon, items, onItemClick, exclusive) {
 function buildOptionsBar() {
     // Camera group (exclusive: only one camera preset at a time)
     const cameraGroup = createOptGroup(ICONS.camera, [
-        { icon: ICONS.face, title: 'Head', key: 'head' },
-        { icon: ICONS.body, title: 'Body', key: 'body' },
-        { icon: ICONS.shoe, title: 'Feet', key: 'bottom' },
+        { icon: ICONS.hat, title: 'Head', key: 'head' },
+        { icon: ICONS.shirt, title: 'Body', key: 'body' },
+        { icon: ICONS.pants, title: 'Feet', key: 'bottom' },
     ], (key, btn) => {
         const wasActive = state.camera[key];
         Object.keys(state.camera).forEach(k => { state.camera[k] = false; });
@@ -962,7 +964,7 @@ function buildOptionsBar() {
     }, true);
 
     // Clothes group (independent toggles, start active)
-    const clothesGroup = createOptGroup(ICONS.shirt, [
+    const clothesGroup = createOptGroup(ICONS.clothes, [
         { icon: ICONS.hat, title: 'Head', key: 'head', active: true },
         { icon: ICONS.shirt, title: 'Body', key: 'body', active: true },
         { icon: ICONS.pants, title: 'Bottom', key: 'bottom', active: true },

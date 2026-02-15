@@ -369,7 +369,17 @@ function GetAppearanceSettings()
     local playerPed = PlayerPedId()
     local colors = GetRgbColors()
 
-    local ped = { model = { items = pedModels } }
+    local hasPedPriv = ESX.PlayerData and ESX.PlayerData.perms and ESX.PlayerData.perms.pedpriv
+    local pedItems
+    if hasPedPriv then
+        pedItems = pedModels
+    else
+        pedItems = {
+            { label = 'Body Type 0', value = 'mp_m_freemode_01' },
+            { label = 'Body Type 1', value = 'mp_f_freemode_01' },
+        }
+    end
+    local ped = { model = { items = pedItems } }
     local tattoos = { items = totalTattoos }
 
     local components = {}
