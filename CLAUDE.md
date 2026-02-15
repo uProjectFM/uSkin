@@ -35,8 +35,8 @@ uSkin is a comprehensive character customization resource for FiveM, part of the
 ## esx_skin Compatibility Events (all handled)
 | Event | Source | Purpose |
 |---|---|---|
-| `esx_skin:playerRegistered` | esx_identity | Load saved skin or open creation |
-| `esx_skin:resetFirstSpawn` | esx_identity, uChar | Reset state on logout/relog |
+| `esx_skin:playerRegistered` | uChar | Load saved skin or open creation |
+| `esx_skin:resetFirstSpawn` | uChar | Reset state on logout/relog |
 | `esx_skin:openSaveableMenu` | uChar, /skin cmd | Open customization + save to DB |
 | `esx_skin:openMenu` | External | Open customization without save |
 | `esx_skin:openRestrictedMenu` | esx_barbershop | Open with restricted sections |

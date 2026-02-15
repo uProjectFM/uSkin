@@ -488,6 +488,10 @@ function StartPlayerCustomization(cb, config)
         SetNuiFocus(true, true)
         SetNuiFocusKeepInput(false)
 
+        pcall(function() exports['uGen']:HideHud() end)
+        pcall(function() exports['uTimer']:StopTimer() end)
+        TriggerEvent('uTalk:hideUI')
+
         SendNUIMessage({ type = 'appearance_display' })
 
         Config.debugPrint('Customization started')
@@ -499,6 +503,9 @@ function ExitPlayerCustomization(appearance)
     DestroyCamera()
     DisplayRadar(true)
     SetNuiFocus(false, false)
+
+    pcall(function() exports['uGen']:ShowHud() end)
+    TriggerEvent('uTalk:showUI')
 
     local playerPed = PlayerPedId()
     ClearPedTasksImmediately(playerPed)
@@ -542,7 +549,7 @@ RegisterNetEvent('esx:playerLoaded', function(_, _, skin)
     end
 end)
 
--- Triggered by esx_identity after character selection
+-- Triggered by uChar after character selection
 AddEventHandler('esx_skin:playerRegistered', function()
     Citizen.CreateThread(function()
         while not playerLoaded do
@@ -572,7 +579,7 @@ AddEventHandler('esx_skin:playerRegistered', function()
     end)
 end)
 
--- Reset first spawn flag (used by esx_identity and uChar on logout/relog)
+-- Reset first spawn flag (used by uChar on logout/relog)
 AddEventHandler('esx_skin:resetFirstSpawn', function()
     playerLoaded = false
     lastSkin = nil

@@ -2,7 +2,7 @@
 -- uSkin - Server
 -- ESX database integration: save/load appearance from users.skin column
 -- Dual format: flat skinchanger keys + _uSkin embedded data for full compatibility
--- Uses same event names as esx_skin for es_extended/esx_identity compatibility
+-- Uses same event names as esx_skin for es_extended/uChar compatibility
 -- ============================
 
 local ESX = exports['es_extended']:getSharedObject()
