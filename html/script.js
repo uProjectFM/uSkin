@@ -15,6 +15,19 @@ function postNUI(name, data) {
 }
 
 // ============================================
+// Sound Bridge (routes through uGen)
+// ============================================
+function playSound(name) {
+    postNUI('playSound', { name: name });
+}
+
+document.addEventListener('mouseover', (e) => {
+    if (e.target.closest('.uskin-opt-btn, .uskin-section-header, .uskin-number-btn, .uskin-color-btn, .uskin-tattoo-tab, .uskin-tattoo-btn')) {
+        playSound('generalui');
+    }
+});
+
+// ============================================
 // State
 // ============================================
 let state = {

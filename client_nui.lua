@@ -4,6 +4,14 @@
 -- ============================
 
 -- ============================
+-- Sound Bridge (JS → uGen)
+-- ============================
+RegisterNUICallback('playSound', function(data, cb)
+    exports['uGen']:PlaySound(data.name)
+    cb('ok')
+end)
+
+-- ============================
 -- Settings & Data
 -- ============================
 RegisterNUICallback('appearance_get_settings_and_data', function(data, cb)
@@ -144,11 +152,13 @@ end)
 -- Save / Exit
 -- ============================
 RegisterNUICallback('appearance_save', function(appearance, cb)
+    exports['uGen']:PlaySound('uiaccept')
     cb({})
     ExitPlayerCustomization(appearance)
 end)
 
 RegisterNUICallback('appearance_exit', function(_, cb)
+    exports['uGen']:PlaySound('uiback')
     cb({})
     ExitPlayerCustomization(nil)
 end)
