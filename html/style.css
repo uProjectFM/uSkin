@@ -301,7 +301,6 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
-    transform: skewX(-2deg);
     line-height: 1;
 }
 
@@ -573,7 +572,6 @@ body {
     color: #4a4a4a;
     cursor: pointer;
     transition: all 0.15s;
-    transform: skewX(-2deg);
 }
 
 .uskin-tattoo-tab:hover {
@@ -635,7 +633,6 @@ body {
     letter-spacing: 0.03em;
     cursor: pointer;
     transition: background 0.15s;
-    transform: skewX(-2deg);
 }
 
 .uskin-tattoo-btn.apply {
