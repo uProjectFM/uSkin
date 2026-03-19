@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>uSkin</title>
     <!-- uGen Design System Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Oxanium:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Font pre-render: forces glyph cache population before first HUD show -->
+    <div aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0"><span style="font-family:'Teko',sans-serif;font-weight:400">x</span><span style="font-family:'Teko',sans-serif;font-weight:500">x</span><span style="font-family:'Teko',sans-serif;font-weight:600">x</span><span style="font-family:'Teko',sans-serif;font-weight:700">x</span><span style="font-family:'Archivo',sans-serif;font-weight:400">x</span><span style="font-family:'Archivo',sans-serif;font-weight:400;font-style:italic">x</span><span style="font-family:'Archivo',sans-serif;font-weight:500">x</span><span style="font-family:'Archivo',sans-serif;font-weight:600">x</span><span style="font-family:'Archivo',sans-serif;font-weight:700">x</span><span style="font-family:'Oxanium',sans-serif;font-weight:400">x</span><span style="font-family:'Oxanium',sans-serif;font-weight:500">x</span><span style="font-family:'Oxanium',sans-serif;font-weight:600">x</span><span style="font-family:'Oxanium',sans-serif;font-weight:700">x</span></div>
     <!-- Main Container - hidden by default -->
     <div id="uSkin-container" class="hidden">
         <!-- Left Sidebar Panel (scrollable sections) -->

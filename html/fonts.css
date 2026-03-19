@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'Teko';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: block;
+    src: url('fonts/Teko.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: block;
+    src: url('fonts/Archivo.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Archivo';
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: block;
+    src: url('fonts/Archivo-Italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Oxanium';
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: block;
+    src: url('fonts/Oxanium.woff2') format('woff2');
+}
