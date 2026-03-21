@@ -25,6 +25,11 @@ files {
     'html/index.html',
     'html/style.css',
     'html/script.js',
+    'html/fonts.css',
+    'html/fonts/Teko.woff2',
+    'html/fonts/Archivo.woff2',
+    'html/fonts/Archivo-Italic.woff2',
+    'html/fonts/Oxanium.woff2',
     'peds.json',
     'tattoos.json',
 }
