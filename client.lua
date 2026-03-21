@@ -590,6 +590,8 @@ end)
 -- ============================
 
 -- Open saveable menu (used by uChar character creation, /skin command)
+-- Note: submitCb/cancelCb from TriggerEvent arrive as nil across resource boundaries.
+-- uChar listens for "uSkin:customizationComplete" instead.
 RegisterNetEvent('esx_skin:openSaveableMenu', function(submitCb, cancelCb)
     StartPlayerCustomization(function(appearance)
         if appearance then
@@ -599,8 +601,10 @@ RegisterNetEvent('esx_skin:openSaveableMenu', function(submitCb, cancelCb)
             lastSkin = appearance
 
             if submitCb then submitCb() end
+            TriggerEvent('uSkin:customizationComplete')
         else
             if cancelCb then cancelCb() end
+            TriggerEvent('uSkin:customizationComplete')
         end
     end, Config.defaultCustomization)
 end)
