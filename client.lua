@@ -24,6 +24,7 @@ local playerAppearance = nil
 local pedTattoos = {}
 local customizationCallback = nil
 local customizationConfig = nil
+local skinSceneOwned = false  -- true when uSkin acquired the scene itself (false = caller like uChar owns it)
 
 -- ============================
 -- Utility Functions
@@ -484,13 +485,17 @@ function StartPlayerCustomization(cb, config)
         -- Create and activate camera (RenderScriptCams is called inside SetCameraPreset on first creation)
         StartCamera()
 
-        DisplayRadar(false)
+        -- Acquire scene if no other resource owns it (e.g. standalone /skin or esx_skin:openMenu).
+        -- When called from uChar, uChar already holds the scene — skip acquisition to avoid conflict.
+        -- AcquireScene handles: HideHud, uTalk:hideUI, DisplayRadar(false), SuppressInteract.
+        if not exports['uGen']:IsSceneLocked() then
+            skinSceneOwned = exports['uGen']:AcquireScene('uSkin')
+        end
+
         SetNuiFocus(true, true)
         SetNuiFocusKeepInput(false)
 
-        pcall(function() exports['uGen']:HideHud() end)
         pcall(function() exports['uTimer']:StopTimer() end)
-        TriggerEvent('uTalk:hideUI')
 
         SendNUIMessage({ type = 'appearance_display' })
 
@@ -501,11 +506,14 @@ end
 function ExitPlayerCustomization(appearance)
     RenderScriptCams(false, false, 0, true, true)
     DestroyCamera()
-    DisplayRadar(true)
     SetNuiFocus(false, false)
 
-    pcall(function() exports['uGen']:ShowHud() end)
-    TriggerEvent('uTalk:showUI')
+    -- Release scene if uSkin acquired it. ReleaseScene restores HUD, radar, voice UI automatically.
+    -- If the caller (e.g. uChar) owns the scene, skip — they manage restoration themselves.
+    if skinSceneOwned then
+        skinSceneOwned = false
+        exports['uGen']:ReleaseScene('uSkin')
+    end
 
     local playerPed = PlayerPedId()
     ClearPedTasksImmediately(playerPed)
