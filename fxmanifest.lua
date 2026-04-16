@@ -16,6 +16,7 @@ server_scripts {
 }
 
 client_scripts {
+    '@uBridge/client_hook.lua',
     'client.lua',
     'client_camera.lua',
     'client_nui.lua',
